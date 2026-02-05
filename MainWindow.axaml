@@ -1,0 +1,587 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:VidStegX.ViewModels"
+        xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
+        x:Class="VidStegX.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="VidStegX - Secure Video Steganography"
+        Width="1400" Height="900"
+        MinWidth="1200" MinHeight="700"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource BgMain}">
+
+	<!-- THEME -->
+	<Window.Resources>
+		<!-- Dark navy background + card -->
+		<SolidColorBrush x:Key="BgMain"   Color="#020612"/>
+		<SolidColorBrush x:Key="BgCard"   Color="#050A18"/>
+
+		<!-- NAVY BUTTON PALETTE -->
+		<SolidColorBrush x:Key="BtnMain"       Color="#00163A"/>
+		<SolidColorBrush x:Key="BtnMainLight"  Color="#082458"/>
+		<SolidColorBrush x:Key="BtnMainDark"   Color="#000F2A"/>
+
+		<!-- PRIMARY / ACCENT (cool blue) -->
+		<SolidColorBrush x:Key="Primary"  Color="#00A0C8"/>
+		<SolidColorBrush x:Key="Accent"   Color="#1B9FFF"/>
+
+		<SolidColorBrush x:Key="TextLight" Color="#F5FBFF"/>
+		<SolidColorBrush x:Key="TextMuted" Color="#6E7F99"/>
+
+		<SolidColorBrush x:Key="GlowSoft" Color="#041428"/>
+	</Window.Resources>
+
+	<!-- STYLES -->
+	<Window.Styles>
+
+		<Style Selector="TextBlock">
+			<Setter Property="Foreground" Value="{StaticResource TextLight}"/>
+		</Style>
+
+		<Style Selector="TextBlock.Title">
+			<Setter Property="FontSize" Value="24"/>
+			<Setter Property="FontWeight" Value="Bold"/>
+			<Setter Property="Foreground" Value="{StaticResource Primary}"/>
+		</Style>
+
+		<Style Selector="TextBlock.Label">
+			<Setter Property="FontSize" Value="11"/>
+			<Setter Property="Foreground" Value="{StaticResource TextMuted}"/>
+			<Setter Property="Margin" Value="0,6,0,2"/>
+		</Style>
+
+		<Style Selector="TextBox">
+			<Setter Property="Height" Value="30"/>
+			<Setter Property="Padding" Value="6"/>
+			<Setter Property="FontSize" Value="12"/>
+			<Setter Property="Background" Value="#050A18"/>
+			<Setter Property="BorderBrush" Value="#00163A"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="Foreground" Value="{StaticResource TextLight}"/>
+		</Style>
+
+		<Style Selector="ProgressBar">
+			<Setter Property="Height" Value="6"/>
+			<Setter Property="Margin" Value="0,4,0,0"/>
+		</Style>
+
+		<Style Selector="Image">
+			<Setter Property="Stretch" Value="Uniform"/>
+			<Setter Property="MaxHeight" Value="220"/>
+		</Style>
+
+		<!-- MAIN CARD -->
+		<Style Selector="Border.Card">
+			<Setter Property="Background" Value="{StaticResource BgCard}"/>
+			<Setter Property="CornerRadius" Value="14"/>
+			<Setter Property="Padding" Value="26,22"/>
+			<Setter Property="BorderBrush" Value="#1B9FFF55"/>
+			<Setter Property="BorderThickness" Value="1.4"/>
+			<Setter Property="BoxShadow"
+                    Value="0 22 40 0 #000000AA, 0 0 40 0 #1B9FFF22"/>
+		</Style>
+
+		<!-- LiveCharts background style -->
+		<Style Selector="lvc|CartesianChart">
+			<Setter Property="Height" Value="100"/>
+			<Setter Property="Margin" Value="0,4,0,0"/>
+			<Setter Property="Background" Value="#050910"/>
+		</Style>
+
+		<!-- NEON BUTTONS (NAVY) -->
+		<Style Selector="Button.neon">
+			<Setter Property="Background" Value="{StaticResource BtnMain}"/>
+			<Setter Property="Foreground" Value="{StaticResource TextLight}"/>
+			<Setter Property="CornerRadius" Value="12"/>
+			<Setter Property="Padding" Value="16,10"/>
+			<Setter Property="FontSize" Value="16"/>
+			<Setter Property="FontWeight" Value="SemiBold"/>
+			<Setter Property="BorderThickness" Value="1.2"/>
+			<Setter Property="BorderBrush" Value="#1B9FFF55"/>
+			<Setter Property="HorizontalContentAlignment" Value="Center"/>
+			<Setter Property="VerticalContentAlignment" Value="Center"/>
+		</Style>
+
+		<Style Selector="Button.neon:pointerover">
+			<Setter Property="Background" Value="{StaticResource BtnMainLight}"/>
+			<Setter Property="BorderBrush" Value="#1B9FFFCC"/>
+		</Style>
+
+		<Style Selector="Button.neon:pressed">
+			<Setter Property="Background" Value="{StaticResource BtnMainDark}"/>
+			<Setter Property="BorderBrush" Value="{StaticResource Accent}"/>
+		</Style>
+	</Window.Styles>
+
+	<Grid RowDefinitions="Auto,*">
+
+		<!-- TOP BAR -->
+		<Border Background="{StaticResource BgMain}" Height="56">
+			<Border.BorderBrush>
+				<LinearGradientBrush StartPoint="0,1" EndPoint="1,1">
+					<GradientStop Color="#00163A" Offset="0"/>
+					<GradientStop Color="#1B9FFF" Offset="1"/>
+				</LinearGradientBrush>
+			</Border.BorderBrush>
+			<Border.BorderThickness>0,0,0,2</Border.BorderThickness>
+
+			<DockPanel Margin="16,0">
+
+				<Border DockPanel.Dock="Right"
+                        Width="44" Height="44"
+                        CornerRadius="12"
+                        Background="{StaticResource BgMain}"
+                        BorderThickness="1.4"
+                        VerticalAlignment="Center">
+					<Border.BorderBrush>
+						<LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+							<GradientStop Color="#00163A" Offset="0"/>
+							<GradientStop Color="#1B9FFF" Offset="1"/>
+						</LinearGradientBrush>
+					</Border.BorderBrush>
+
+					<Image Source="avares://VidStegX/Assets/VidStegX-logo.png"
+                           Stretch="Uniform"
+                           Margin="4"
+                           Opacity="0.95"/>
+				</Border>
+
+				<StackPanel Orientation="Horizontal"
+                            VerticalAlignment="Center"
+                            Spacing="10">
+					<TextBlock Text="VidStegX"
+                               FontSize="20"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource Primary}"/>
+
+					<TextBlock Text="{Binding StatusMessage}"
+                               FontSize="12"
+                               Margin="6,2,0,0"
+                               Foreground="{StaticResource TextMuted}"/>
+				</StackPanel>
+
+			</DockPanel>
+		</Border>
+
+		<!-- MAIN CONTENT -->
+		<Grid Grid.Row="1">
+
+			<!-- MAIN MENU -->
+			<Grid IsVisible="{Binding IsMenuVisible}">
+				<Border Classes="Card"
+                        Margin="32,40"
+                        MaxWidth="1180"
+                        MinHeight="420"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+					<Border.BorderBrush>
+						<LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+							<GradientStop Color="#00163A" Offset="0"/>
+							<GradientStop Color="#1B9FFF" Offset="1"/>
+						</LinearGradientBrush>
+					</Border.BorderBrush>
+					<Border.BorderThickness>1.6</Border.BorderThickness>
+
+					<StackPanel Spacing="18"
+                                HorizontalAlignment="Center">
+
+						<Image Source="avares://VidStegX/Assets/VidStegX-logo.png"
+                               Width="160"
+                               Height="160"
+                               Stretch="Uniform"
+                               Margin="0,8,0,4"
+                               Opacity="0.98"/>
+
+						<TextBlock Text="VidStegX"
+                                   FontSize="40"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource Primary}"
+                                   HorizontalAlignment="Center"/>
+
+						<TextBlock Text="Reversible, Secure Video Steganography"
+                                   FontSize="14"
+                                   Foreground="{StaticResource TextMuted}"
+                                   HorizontalAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   Margin="0,4,0,0"/>
+
+						<Border Height="2"
+                                Width="260"
+                                Margin="0,12,0,0"
+                                Background="{StaticResource Accent}"/>
+
+						<Grid ColumnDefinitions="*,*,*"
+                              Margin="0,22,0,6"
+                              ColumnSpacing="24">
+
+							<Button Grid.Column="0"
+                                    Classes="neon"
+                                    Command="{Binding ShowEmbedCommand}">
+								<StackPanel Spacing="4" Margin="4">
+									<TextBlock Text="EMBED"
+                                               FontSize="20"
+                                               HorizontalAlignment="Center"/>
+									<TextBlock Text="Hide secret text in video"
+                                               FontSize="12"
+                                               Foreground="{StaticResource TextMuted}"
+                                               HorizontalAlignment="Center"
+                                               TextWrapping="Wrap"/>
+								</StackPanel>
+							</Button>
+
+							<Button Grid.Column="1"
+                                    Classes="neon"
+                                    Command="{Binding ShowExtractCommand}">
+								<StackPanel Spacing="4" Margin="4">
+									<TextBlock Text="EXTRACT"
+                                               FontSize="20"
+                                               HorizontalAlignment="Center"/>
+									<TextBlock Text="Recover hidden message"
+                                               FontSize="12"
+                                               Foreground="{StaticResource TextMuted}"
+                                               HorizontalAlignment="Center"
+                                               TextWrapping="Wrap"/>
+								</StackPanel>
+							</Button>
+
+							<Button Grid.Column="2"
+                                    Classes="neon"
+                                    Command="{Binding ShowCompareCommand}">
+								<StackPanel Spacing="4" Margin="4">
+									<TextBlock Text="COMPARE"
+                                               FontSize="20"
+                                               HorizontalAlignment="Center"/>
+									<TextBlock Text="Quality / PSNR analysis"
+                                               FontSize="12"
+                                               Foreground="{StaticResource TextMuted}"
+                                               HorizontalAlignment="Center"
+                                               TextWrapping="Wrap"/>
+								</StackPanel>
+							</Button>
+						</Grid>
+					</StackPanel>
+				</Border>
+			</Grid>
+
+			<!-- EMBED PANEL -->
+			<Grid IsVisible="{Binding IsEmbedVisible}"
+                  Background="{StaticResource BgMain}">
+				<Grid Margin="24"
+                      RowDefinitions="Auto,Auto"
+                      RowSpacing="12">
+
+					<Grid Grid.Row="0"
+                          ColumnDefinitions="*,*"
+                          ColumnSpacing="18">
+
+						<StackPanel Grid.Column="0" Spacing="8">
+							<Button Content="← Back"
+                                    Classes="neon"
+                                    Padding="10,4"
+                                    FontSize="12"
+                                    Command="{Binding ShowMenuCommand}"
+                                    HorizontalAlignment="Left"
+                                    Margin="0,0,0,4"/>
+							<TextBlock Text="Embed Secret Message"
+                                       Classes="Title"
+                                       Margin="0,0,0,8"/>
+
+							<TextBlock Text="Secret Message" Classes="Label"/>
+							<TextBox Height="110"
+                                     Text="{Binding HiddenMessage}"
+                                     Watermark="Enter secret text..."
+                                     TextWrapping="Wrap"
+                                     AcceptsReturn="True"/>
+
+							<TextBlock Text="Key" Classes="Label"/>
+							<TextBox Text="{Binding EncryptionKey}"
+                                     PasswordChar="*"
+                                     Watermark="Strong key"/>
+
+							<TextBlock Text="Cover Video (AVI preferred)" Classes="Label"/>
+							<Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
+								<TextBox Grid.Column="0"
+                                         Text="{Binding CoverVideoPath}"
+                                         IsReadOnly="True"/>
+								<Button Grid.Column="1"
+                                        Classes="neon"
+                                        Content="Browse"
+                                        Padding="10,4"
+                                        Command="{Binding SelectCoverCommand}"/>
+							</Grid>
+
+							<Button Content="Start Embedding"
+                                    Classes="neon"
+                                    Margin="0,10,0,0"
+                                    Command="{Binding EmbedCommand}"
+                                    IsEnabled="{Binding CanEmbed}"/>
+						</StackPanel>
+
+						<StackPanel Grid.Column="1" Spacing="8">
+							<TextBlock Text="Real‑time Frame Preview" Classes="Label"/>
+							<Border Classes="Card" Height="260">
+								<Image Source="{Binding VideoPreview}" />
+							</Border>
+
+							<TextBlock Text="Embedding Progress (%)" Classes="Label"/>
+							<ProgressBar Value="{Binding ProgressValue}"
+                                         Maximum="100"
+                                         IsVisible="{Binding IsProcessing}"/>
+
+							<!-- progress chart -->
+							<lvc:CartesianChart
+                                Series="{Binding EmbeddingProgressSeries}"
+                                XAxes="{Binding ProgressXAxis}"/>
+						</StackPanel>
+					</Grid>
+
+					<StackPanel Grid.Row="1"
+                                Spacing="6"
+                                Margin="0,4,0,0">
+						<TextBlock Text="Experiment Metrics (Embed)" Classes="Label"/>
+						<Grid ColumnDefinitions="*,*,*"
+                              ColumnSpacing="12"
+                              Height="120">
+							<StackPanel Grid.Column="0">
+								<TextBlock Text="Performance (s)" Classes="Label"/>
+								<lvc:CartesianChart
+                                    Series="{Binding PerformanceSeries}"
+                                    XAxes="{Binding MetricsXAxis}"/>
+							</StackPanel>
+							<StackPanel Grid.Column="1">
+								<TextBlock Text="Capacity (bits/frame)" Classes="Label"/>
+								<lvc:CartesianChart
+                                    Series="{Binding CapacitySeries}"
+                                    XAxes="{Binding MetricsXAxis}"/>
+							</StackPanel>
+							<StackPanel Grid.Column="2">
+								<TextBlock Text="Accuracy (%)" Classes="Label"/>
+								<lvc:CartesianChart
+                                    Series="{Binding AccuracySeries}"
+                                    XAxes="{Binding MetricsXAxis}"/>
+							</StackPanel>
+						</Grid>
+					</StackPanel>
+				</Grid>
+			</Grid>
+
+			<!-- EXTRACT PANEL -->
+			<Grid IsVisible="{Binding IsExtractVisible}"
+                  Background="{StaticResource BgMain}">
+				<Grid Margin="24"
+                      RowDefinitions="Auto,Auto"
+                      RowSpacing="12">
+
+					<Grid Grid.Row="0"
+                          ColumnDefinitions="*,*"
+                          ColumnSpacing="18">
+
+						<StackPanel Grid.Column="0" Spacing="8">
+							<Button Content="← Back"
+                                    Classes="neon"
+                                    Padding="10,4"
+                                    FontSize="12"
+                                    Command="{Binding ShowMenuCommand}"
+                                    HorizontalAlignment="Left"
+                                    Margin="0,0,0,4"/>
+							<TextBlock Text="Extract Hidden Message"
+                                       Classes="Title"
+                                       Margin="0,0,0,8"/>
+
+							<TextBlock Text="Key" Classes="Label"/>
+							<TextBox Text="{Binding SecretKey}"
+                                     PasswordChar="*"
+                                     Watermark="Enter key"/>
+
+							<TextBlock Text="Stego Video" Classes="Label"/>
+							<Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
+								<TextBox Grid.Column="0"
+                                         Text="{Binding VideoPath}"
+                                         IsReadOnly="True"/>
+								<Button Grid.Column="1"
+                                        Classes="neon"
+                                        Content="Browse"
+                                        Padding="10,4"
+                                        Command="{Binding SelectStegoCommand}"/>
+							</Grid>
+
+							<Button Content="Start Extraction"
+                                    Classes="neon"
+                                    Margin="0,10,0,0"
+                                    Command="{Binding ExtractCommand}"
+                                    IsEnabled="{Binding CanExtract}"/>
+
+							<TextBlock Text="Extracted Message" Classes="Label" Margin="0,10,0,2"/>
+							<TextBox Height="110"
+                                     Text="{Binding ExtractedMessage}"
+                                     IsReadOnly="True"
+                                     TextWrapping="Wrap"
+                                     AcceptsReturn="True"
+                                     Watermark="Message will appear here..."/>
+						</StackPanel>
+
+						<StackPanel Grid.Column="1" Spacing="8">
+							<TextBlock Text="Real‑time Frame Preview" Classes="Label"/>
+							<Border Classes="Card" Height="260">
+								<Image Source="{Binding VideoPreview}"/>
+							</Border>
+
+							<TextBlock Text="Extraction Progress (%)" Classes="Label"/>
+							<ProgressBar Value="{Binding ProgressValue}"
+                                         Maximum="100"
+                                         IsVisible="{Binding IsProcessing}"/>
+
+							<lvc:CartesianChart
+                                Series="{Binding ExtractionProgressSeries}"
+                                XAxes="{Binding ProgressXAxis}"/>
+						</StackPanel>
+					</Grid>
+
+					<StackPanel Grid.Row="1"
+                                Spacing="6"
+                                Margin="0,4,0,0">
+						<TextBlock Text="Experiment Metrics (Extract)" Classes="Label"/>
+						<Grid ColumnDefinitions="*,*,*"
+                              ColumnSpacing="12"
+                              Height="120">
+							<StackPanel Grid.Column="0">
+								<TextBlock Text="Performance (s)" Classes="Label"/>
+								<lvc:CartesianChart
+                                    Series="{Binding PerformanceSeries}"
+                                    XAxes="{Binding MetricsXAxis}"/>
+							</StackPanel>
+							<StackPanel Grid.Column="1">
+								<TextBlock Text="Capacity (bits/frame)" Classes="Label"/>
+								<lvc:CartesianChart
+                                    Series="{Binding CapacitySeries}"
+                                    XAxes="{Binding MetricsXAxis}"/>
+							</StackPanel>
+							<StackPanel Grid.Column="2">
+								<TextBlock Text="Accuracy (%)" Classes="Label"/>
+								<lvc:CartesianChart
+                                    Series="{Binding AccuracySeries}"
+                                    XAxes="{Binding MetricsXAxis}"/>
+							</StackPanel>
+						</Grid>
+					</StackPanel>
+				</Grid>
+			</Grid>
+
+			<!-- COMPARE PANEL -->
+			<Grid IsVisible="{Binding IsCompareVisible}"
+                  Background="{StaticResource BgMain}">
+				<Grid Margin="24"
+                      RowDefinitions="Auto,Auto"
+                      RowSpacing="12">
+
+					<Grid Grid.Row="0"
+                          RowDefinitions="Auto,*"
+                          RowSpacing="8">
+						<StackPanel Orientation="Horizontal"
+                                    Spacing="8">
+							<Button Content="← Back"
+                                    Classes="neon"
+                                    Padding="10,4"
+                                    FontSize="12"
+                                    Command="{Binding ShowMenuCommand}"
+                                    HorizontalAlignment="Left"/>
+							<TextBlock Text="Compare Cover vs Restored"
+                                       Classes="Title"
+                                       VerticalAlignment="Center"/>
+						</StackPanel>
+
+						<Grid Grid.Row="1"
+                              ColumnDefinitions="*,*,*"
+                              ColumnSpacing="18">
+							<StackPanel Grid.Column="0" Spacing="6">
+								<TextBlock Text="Cover Video" Classes="Label"/>
+								<Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
+									<TextBox Grid.Column="0"
+                                             Text="{Binding Video1Path}"
+                                             IsReadOnly="True"/>
+									<Button Grid.Column="1"
+                                            Classes="neon"
+                                            Content="Browse"
+                                            Padding="10,4"
+                                            Command="{Binding BrowseVideo1Command}"/>
+								</Grid>
+								<Border Classes="Card" Height="160">
+									<Image Source="{Binding Preview1}"/>
+								</Border>
+							</StackPanel>
+
+							<StackPanel Grid.Column="1" Spacing="6">
+								<TextBlock Text="Restored Video" Classes="Label"/>
+								<Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
+									<TextBox Grid.Column="0"
+                                             Text="{Binding Video2Path}"
+                                             IsReadOnly="True"/>
+									<Button Grid.Column="1"
+                                            Classes="neon"
+                                            Content="Browse"
+                                            Padding="10,4"
+                                            Command="{Binding BrowseVideo2Command}"/>
+								</Grid>
+								<Border Classes="Card" Height="160">
+									<Image Source="{Binding Preview2}"/>
+								</Border>
+							</StackPanel>
+
+							<StackPanel Grid.Column="2" Spacing="6">
+								<TextBlock Text="Difference Preview" Classes="Label"/>
+								<Border Classes="Card" Height="160">
+									<Image Source="{Binding DiffPreview}"/>
+								</Border>
+							</StackPanel>
+						</Grid>
+					</Grid>
+
+					<StackPanel Grid.Row="1"
+                                Spacing="6"
+                                Margin="0,4,0,0">
+						<StackPanel Orientation="Horizontal"
+                                    Spacing="8"
+                                    HorizontalAlignment="Center">
+							<Button Content="Start Comparison"
+                                    Classes="neon"
+                                    Command="{Binding CompareVideosCommand}"
+                                    IsEnabled="{Binding CanCompare}"/>
+							<Button Content="Clear"
+                                    Classes="neon"
+                                    Command="{Binding ClearCommand}"/>
+						</StackPanel>
+
+						<TextBlock Text="{Binding ResultText}"
+                                   Foreground="{StaticResource Primary}"
+                                   FontSize="12"
+                                   TextWrapping="Wrap"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,4,0,0"/>
+
+						<ProgressBar Value="{Binding ProgressValue}"
+                                     Maximum="100"
+                                     IsVisible="{Binding IsProcessing}"/>
+
+						<!-- Message TextBox -->
+						<TextBox Text="{Binding HiddenMessage}"
+								 Watermark="Message (max 15 characters)" />
+
+						<!-- Key TextBox (Embed) -->
+						<TextBox Text="{Binding EncryptionKey}"
+								 Watermark="Key (4–32 characters)" />
+
+						<!-- Key TextBox (Extract) -->
+						<TextBox Text="{Binding SecretKey}"
+								 Watermark="Key (4–32 characters)" />
+
+						<TextBlock Text="PSNR per Frame (dB)" Classes="Label"/>
+						<lvc:CartesianChart
+                            Series="{Binding PsnrSeries}"
+                            XAxes="{Binding PsnrXAxis}"/>
+					</StackPanel>
+				</Grid>
+			</Grid>
+
+		</Grid>
+	</Grid>
+</Window>
